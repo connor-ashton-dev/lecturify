@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 export default function Home() {
   const PROD_URL = "https://lecturify-production.up.railway.app";
   const DEV_URL = "http://192.168.86.246:1337";
-  const prod = false;
+  const prod = process.env.NODE_ENV === "production";
   const apiUrl = prod ? PROD_URL : DEV_URL;
 
   // Define state variables for the result, recording status, and media recorder
