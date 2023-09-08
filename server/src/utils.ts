@@ -1,10 +1,10 @@
-// import OpenAI from "openai";
+import OpenAI from "openai";
 import FormData from "form-data";
 import axios from "axios";
 //
-// const openai = new OpenAI({
-//   apiKey: process.env.OPENAI_API_KEY,
-// });
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+});
 
 export const openAITranscribe = async (base64Audio: string) => {
   const audioBuffer = Buffer.from(base64Audio, "base64");
@@ -39,4 +39,23 @@ export const openAITranscribe = async (base64Audio: string) => {
     console.log(error);
     return "error";
   }
+};
+
+export const openAISummarize = async (text: string) => {
+  const completion = await openai.chat.completions.create({
+    messages: [
+      {
+        role: "system",
+        content:
+          "You are a highly skilled AI trained in language comprehension and summarization. You will hear a lecture and summarize it. Include as much information as you can. The first section will be titled Notes and will include bullet points, then create a section called quiz and create a practice quiz for the notes. Finally, create a key words section with unfamiliar words and definitions",
+      },
+      {
+        role: "user",
+        content: text,
+      },
+    ],
+    model: "gpt-3.5-turbo",
+  });
+
+  return completion.choices[0];
 };

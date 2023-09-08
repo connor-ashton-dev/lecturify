@@ -22,6 +22,7 @@ export default function Home() {
         .then((stream) => {
           const newMediaRecorder = new MediaRecorder(stream);
           newMediaRecorder.onstart = () => {
+            //clear chunks
             chunks = [];
           };
           newMediaRecorder.ondataavailable = (e) => {
@@ -46,7 +47,7 @@ export default function Home() {
                 }
                 const base64Audio = result.split(",")[1];
                 const response = await fetch(
-                  "http://192.168.86.246:1337/transcribe",
+                  "https://lecturify-production.up.railway.app/transcribe",
                   {
                     method: "POST",
                     headers: {
