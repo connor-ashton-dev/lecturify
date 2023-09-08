@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 // This is the main component of our application
 export default function Home() {
   const PROD_URL = "https://lecturify-production.up.railway.app";
-  const DEV_URL = "http://192.168.86.246:1337";
+  const DEV_URL = "http://10.253.30.74:1337";
   const prod = process.env.NODE_ENV === "production";
   const apiUrl = prod ? PROD_URL : DEV_URL;
 
@@ -68,23 +68,23 @@ export default function Home() {
                   );
                 }
 
-                //Summarize
-                const summary = await fetch(`${apiUrl}/summarize`, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ text: data.result }),
-                });
-
-                const summaryRes = await summary.json();
-                if (summary.status !== 200) {
-                  throw (
-                    data.error ||
-                    new Error(`Request failed with status ${summary.status}`)
-                  );
-                }
-                formatResult(summaryRes.result);
+                // //Summarize
+                // const summary = await fetch(`${apiUrl}/summarize`, {
+                //   method: "POST",
+                //   headers: {
+                //     "Content-Type": "application/json",
+                //   },
+                //   body: JSON.stringify({ text: data.result }),
+                // });
+                //
+                // const summaryRes = await summary.json();
+                // if (summary.status !== 200) {
+                //   throw (
+                //     data.error ||
+                //     new Error(`Request failed with status ${summary.status}`)
+                //   );
+                // }
+                formatResult(data.result);
 
                 setLoading(false);
               };
