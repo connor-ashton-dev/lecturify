@@ -8,7 +8,6 @@ export default function Home() {
   const DEV_URL = "http://192.168.86.46:1337";
   const prod = false;
 
-  const URL = prod ? PROD_URL : DEV_URL;
   // Define state variables for the result, recording status, and media recorder
   const [result, setResult] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
