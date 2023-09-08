@@ -49,14 +49,12 @@ export const openAISummarize = async (text: string) => {
       {
         role: "system",
         content: `You are a highly skilled AI trained in language comprehension and summarization. 
-          You will hear a lecture and summarize it. Include as much information as you can. 
-          You will write this summmary in the form of notes, following all the best practicecs.
-          For the format, use ! instead of dashes for bullet points, not dashes. No dashes.
-          There will be 4 sections.
-          Brief summary
-          Notes
-          Practice quiz
-          Word definitions
+          You will hear a things and summarize them. You will be doing this primarily for students. Include as much information as you can. Write really good notes.
+          Make it have 4 sections:
+          Brief summary,
+          Notes,
+          Practice quiz,
+          Word definitions,
           `,
       },
       {
