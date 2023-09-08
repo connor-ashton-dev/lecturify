@@ -36,6 +36,7 @@ export const openAITranscribe = async (base64Audio: string) => {
     return text;
   } catch (error) {
     console.log(error);
+    console.log(error);
     return "error";
   }
 };
