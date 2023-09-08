@@ -4,6 +4,11 @@ import { useState, useEffect } from "react";
 
 // This is the main component of our application
 export default function Home() {
+  const PROD_URL = "https://lecturify-production.up.railway.app";
+  const DEV_URL = "http://192.168.86.46:1337";
+  const prod = false;
+
+  const URL = prod ? PROD_URL : DEV_URL;
   // Define state variables for the result, recording status, and media recorder
   const [result, setResult] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
@@ -46,6 +51,8 @@ export default function Home() {
                   throw new Error("No result from reader");
                 }
                 const base64Audio = result.split(",")[1];
+
+                //Transcribe
                 const response = await fetch(
                   "https://lecturify-production.up.railway.app/transcribe",
                   {
@@ -63,7 +70,30 @@ export default function Home() {
                     new Error(`Request failed with status ${response.status}`)
                   );
                 }
+
+                //Summarize
+                const summary = await fetch(
+                  "https://lecturify-production.up.railway.app/transcribe",
+                  {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ text: data.result }),
+                  }
+                );
+                const summaryRes = await summary.json();
+                if (response.status !== 200) {
+                  throw (
+                    data.error ||
+                    new Error(`Request failed with status ${response.status}`)
+                  );
+                }
+
+                console.log(summaryRes);
+
                 formatResult(data.result);
+
                 setLoading(false);
               };
             } catch (error: any) {
