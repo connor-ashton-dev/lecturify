@@ -5,8 +5,9 @@ import { useState, useEffect } from "react";
 // This is the main component of our application
 export default function Home() {
   const PROD_URL = "https://lecturify-production.up.railway.app";
-  const DEV_URL = "http://192.168.86.46:1337";
+  const DEV_URL = "http://192.168.86.246:1337";
   const prod = false;
+  const apiUrl = prod ? PROD_URL : DEV_URL;
 
   // Define state variables for the result, recording status, and media recorder
   const [result, setResult] = useState<string>("");
@@ -52,16 +53,13 @@ export default function Home() {
                 const base64Audio = result.split(",")[1];
 
                 //Transcribe
-                const response = await fetch(
-                  "https://lecturify-production.up.railway.app/transcribe",
-                  {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ audio: base64Audio }),
-                  }
-                );
+                const response = await fetch(`${apiUrl}/transcribe`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ audio: base64Audio }),
+                });
                 const data = await response.json();
                 if (response.status !== 200) {
                   throw (
@@ -71,24 +69,21 @@ export default function Home() {
                 }
 
                 //Summarize
-                const summary = await fetch(
-                  "https://lecturify-production.up.railway.app/summarize",
-                  {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ text: data.result }),
-                  }
-                );
+                const summary = await fetch(`${apiUrl}/summarize`, {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
+                  body: JSON.stringify({ text: data.result }),
+                });
+
                 const summaryRes = await summary.json();
-                if (response.status !== 200) {
+                if (summary.status !== 200) {
                   throw (
                     data.error ||
-                    new Error(`Request failed with status ${response.status}`)
+                    new Error(`Request failed with status ${summary.status}`)
                   );
                 }
-
                 formatResult(summaryRes.result);
 
                 setLoading(false);

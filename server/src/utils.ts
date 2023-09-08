@@ -1,7 +1,10 @@
 import OpenAI from "openai";
 import FormData from "form-data";
 import axios from "axios";
-//
+import dotenv from "dotenv";
+
+dotenv.config();
+
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
@@ -36,7 +39,6 @@ export const openAITranscribe = async (base64Audio: string) => {
     return text;
   } catch (error) {
     console.log(error);
-    console.log(error);
     return "error";
   }
 };
@@ -46,8 +48,16 @@ export const openAISummarize = async (text: string) => {
     messages: [
       {
         role: "system",
-        content:
-          "You are a highly skilled AI trained in language comprehension and summarization. You will hear a lecture and summarize it. Include as much information as you can. The first section will be titled Notes and will include bullet points, then create a section called quiz and create a practice quiz for the notes. Finally, create a key words section with unfamiliar words and definitions",
+        content: `You are a highly skilled AI trained in language comprehension and summarization. 
+          You will hear a lecture and summarize it. Include as much information as you can. 
+          You will write this summmary in the form of notes, following all the best practicecs.
+          For the format, use ! instead of dashes for bullet points, not dashes. No dashes.
+          There will be 4 sections.
+          Brief summary
+          Notes
+          Practice quiz
+          Word definitions
+          `,
       },
       {
         role: "user",
@@ -57,5 +67,5 @@ export const openAISummarize = async (text: string) => {
     model: "gpt-3.5-turbo",
   });
 
-  return completion.choices[0];
+  return completion.choices[0].message.content;
 };
