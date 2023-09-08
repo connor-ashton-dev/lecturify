@@ -72,7 +72,7 @@ export default function Home() {
 
                 //Summarize
                 const summary = await fetch(
-                  "https://lecturify-production.up.railway.app/transcribe",
+                  "https://lecturify-production.up.railway.app/summarize",
                   {
                     method: "POST",
                     headers: {
@@ -89,9 +89,7 @@ export default function Home() {
                   );
                 }
 
-                console.log(summaryRes);
-
-                formatResult(data.result);
+                formatResult(summaryRes.result);
 
                 setLoading(false);
               };
