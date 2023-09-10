@@ -1,133 +1,51 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import {
+  setUpMediaRecorder,
+  stopRecording,
+  startRecording,
+} from "@/utils/record";
+import Summary from "@/components/custom/summary";
+import Navbar from "@/components/custom/navbar";
 
-// This is the main component of our application
 export default function Home() {
-  const PROD_URL = "https://lecturify-production.up.railway.app";
-  const DEV_URL = "http://192.168.86.246:1337";
-  const prod = process.env.NODE_ENV === "production";
-  const apiUrl = prod ? PROD_URL : DEV_URL;
-
-  // Define state variables for the result, recording status, and media recorder
   const [result, setResult] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [recording, setRecording] = useState(false);
-  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(
-    null
-  );
-  // This array will hold the audio data
-  //TODO: Fix any type
-  let chunks: Blob[] = [];
-  // This useEffect hook sets up the media recorder when the component mounts
+  const [recording, setRecording] = useState<boolean>(false);
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      navigator.mediaDevices
-        .getUserMedia({ audio: true })
-        .then((stream) => {
-          const newMediaRecorder = new MediaRecorder(stream);
-          newMediaRecorder.onstart = () => {
-            //clear chunks
-            chunks = [];
-          };
-          newMediaRecorder.ondataavailable = (e) => {
-            chunks.push(e.data);
-          };
-          newMediaRecorder.onstop = async () => {
-            const audioBlob = new Blob(chunks, { type: "audio/webm" });
-            const audioUrl = URL.createObjectURL(audioBlob);
-            const audio = new Audio(audioUrl);
-            audio.onerror = function (err) {
-              console.error("Error playing audio:", err);
-            };
-            // audio.play();
-            try {
-              setLoading(true);
-              const reader = new FileReader();
-              reader.readAsDataURL(audioBlob);
-              reader.onloadend = async function () {
-                const result = reader.result as string;
-                if (!result) {
-                  throw new Error("No result from reader");
-                }
-                const base64Audio = result.split(",")[1];
-
-                //Transcribe
-                const response = await fetch(`${apiUrl}/transcribe`, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ audio: base64Audio }),
-                });
-                const data = await response.json();
-                if (response.status !== 200) {
-                  throw (
-                    data.error ||
-                    new Error(`Request failed with status ${response.status}`)
-                  );
-                }
-
-                //Summarize
-                const summary = await fetch(`${apiUrl}/summarize`, {
-                  method: "POST",
-                  headers: {
-                    "Content-Type": "application/json",
-                  },
-                  body: JSON.stringify({ text: data.result }),
-                });
-
-                const summaryRes = await summary.json();
-                if (summary.status !== 200) {
-                  throw (
-                    data.error ||
-                    new Error(`Request failed with status ${summary.status}`)
-                  );
-                }
-                formatResult(summaryRes.result);
-
-                setLoading(false);
-              };
-            } catch (error: any) {
-              console.error(error);
-              alert(error.message);
-            }
-          };
-          setMediaRecorder(newMediaRecorder);
-        })
-        .catch((err) => console.error("Error accessing microphone:", err));
-    }
+    setUpMediaRecorder({
+      setLoading,
+      setResult,
+    });
   }, []);
-  // Function to start recording
-  const startRecording = () => {
-    if (mediaRecorder) {
-      mediaRecorder.start();
-      setRecording(true);
-    }
-  };
-
-  const formatResult = (text: string) => {
-    // add a new line before each dash
-    let formattedResult = text.replace(/-/g, "\n - ");
-    console.log(formattedResult);
-    setResult(formattedResult);
-  };
-  // Function to stop recording
-  const stopRecording = () => {
-    if (mediaRecorder) {
-      mediaRecorder.stop();
-      setRecording(false);
-    }
-  };
-  // Render the component
   return (
-    <main>
-      <div>
-        <button onClick={recording ? stopRecording : startRecording}>
-          {recording ? "Stop Recording" : "Start Recording"}
-        </button>
-        {loading && <p>Transcription in progress...</p>}
-        <pre>{result}</pre>
+    <main className="w-screen h-screen bg-[#FAF9F6]">
+      <Navbar />
+      <div className="m-8">
+        <Summary result={result} />
+
+        <div className="mt-10">
+          {!loading && (
+            <Button
+              onClick={
+                recording
+                  ? () => stopRecording({ setRecording })
+                  : () => startRecording({ setRecording })
+              }
+            >
+              {recording ? "Stop Recording" : "Start Recording"}
+            </Button>
+          )}
+          {loading && (
+            <Button disabled>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Loading ...
+            </Button>
+          )}
+        </div>
       </div>
     </main>
   );

@@ -17,6 +17,10 @@ app.use(
 app.use(bodyParser.json({ limit: "50mb" }));
 const port = process.env.PORT || 1337;
 
+app.get("/", (req, res) => {
+  res.send("Hello World!");
+});
+
 app.post("/transcribe", async (req, res) => {
   const audio = req.body.audio;
   const transcription = await openAITranscribe(audio);
