@@ -15,7 +15,7 @@ const apiUrl = prod ? PROD_URL : DEV_URL;
 let chunks: Blob[] = [];
 let mediaRecorder: MediaRecorder | null = null;
 
-export const setUpMediaRecorder = ({
+export const setUpMediaRecorder = async ({
   setLoading,
   setResult,
 }: MediaRecorderProps) => {
@@ -24,7 +24,7 @@ export const setUpMediaRecorder = ({
       "Your browser does not support the MediaRecorder API. Please try another browser."
     );
   } else {
-    navigator.mediaDevices
+    const newStream = await navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
         const newMediaRecorder = new MediaRecorder(stream);
@@ -33,6 +33,7 @@ export const setUpMediaRecorder = ({
         };
         newMediaRecorder.ondataavailable = (e) => {
           chunks.push(e.data);
+          console.log("Data available:", e.data.size);
         };
         newMediaRecorder.onstop = async () => {
           try {
@@ -57,8 +58,6 @@ export const setUpMediaRecorder = ({
                 throw new Error("No result from reader");
               }
               const base64Audio = result.split(",")[1];
-              console.log("base64", base64Audio);
-
               //Transcribe
               const response = await fetch(`${apiUrl}/transcribe`, {
                 method: "POST",
@@ -74,6 +73,7 @@ export const setUpMediaRecorder = ({
               }
 
               const data = await response.json();
+              console.log(data.result);
               setResult("Transcribed your lecture! Now summarizing it...");
 
               //Summarize
