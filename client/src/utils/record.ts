@@ -19,7 +19,14 @@ export const setUpMediaRecorder = ({
   setLoading,
   setResult,
 }: MediaRecorderProps) => {
-  if (typeof window !== "undefined") {
+  if (
+    typeof navigator.mediaDevices.getUserMedia === "undefined" ||
+    typeof MediaRecorder === "undefined"
+  ) {
+    alert(
+      "Your browser does not support the MediaRecorder API. Please try another browser."
+    );
+  } else {
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
@@ -31,7 +38,7 @@ export const setUpMediaRecorder = ({
           chunks.push(e.data);
         };
         newMediaRecorder.onstop = async () => {
-          const audioBlob = new Blob(chunks, { type: "audio/webm" });
+          const audioBlob = new Blob(chunks, { type: "audio/wav" });
           const audioUrl = URL.createObjectURL(audioBlob);
           const audio = new Audio(audioUrl);
           audio.onerror = function (err) {
