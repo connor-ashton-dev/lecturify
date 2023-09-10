@@ -35,15 +35,19 @@ export const setUpMediaRecorder = ({
           chunks.push(e.data);
         };
         newMediaRecorder.onstop = async () => {
-          const audioBlob = new Blob(chunks, {
-            type: "audio/ogg; codecs=opus",
-          });
-          const audioUrl = URL.createObjectURL(audioBlob);
-          const audio = new Audio(audioUrl);
-          audio.onerror = function (err) {
-            console.error("Error playing audio:", err);
-          };
           try {
+            const audioBlob = new Blob(chunks, {
+              type: "audio/wav; codecs=opus",
+            });
+            console.log("Audio Blob", audioBlob);
+            const audioUrl = URL.createObjectURL(audioBlob);
+            console.log("Audio URL", audioUrl);
+            const audio = new Audio(audioUrl);
+
+            audio.onerror = function (err) {
+              console.error("Failed to load audio:", err);
+            };
+
             setLoading(true);
             const reader = new FileReader();
             reader.readAsDataURL(audioBlob);
@@ -53,6 +57,7 @@ export const setUpMediaRecorder = ({
                 throw new Error("No result from reader");
               }
               const base64Audio = result.split(",")[1];
+              console.log("base64", base64Audio);
 
               //Transcribe
               const response = await fetch(`${apiUrl}/transcribe`, {
@@ -93,18 +98,12 @@ export const setUpMediaRecorder = ({
             };
           } catch (error: any) {
             console.error(error);
-            alert(error.message);
           }
         };
         mediaRecorder = newMediaRecorder;
       })
       .catch((err) => console.error("Error accessing microphone:", err));
   }
-  return () => {
-    if (mediaRecorder && mediaRecorder.state !== "inactive") {
-      mediaRecorder.stop();
-    }
-  };
 };
 
 export const startRecording = ({ setRecording }: RecordProps) => {
