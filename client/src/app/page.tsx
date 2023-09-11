@@ -29,9 +29,9 @@ export default function Home() {
   return (
     <main className="w-screen h-screen bg-[#FAF9F6]">
       <Navbar />
-      <div>
-        <p>Mic State: {micState}</p>
-      </div>
+      {/* <div> */}
+      {/*   <p>Mic State: {micState}</p> */}
+      {/* </div> */}
       <div className="m-8">
         <Summary result={result} />
 
