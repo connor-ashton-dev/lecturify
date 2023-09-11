@@ -118,9 +118,7 @@ export const startRecording = async ({
   setResult,
   mediaRecorderRef,
 }: RecordProps) => {
-  if (!mediaRecorderRef.current) {
-    await setUpMediaRecorder({ setLoading, setResult, mediaRecorderRef });
-  }
+  await setUpMediaRecorder({ setLoading, setResult, mediaRecorderRef });
   if (mediaRecorderRef.current) {
     mediaRecorderRef.current.start();
     setRecording(true);
@@ -134,5 +132,9 @@ export const stopRecording = ({
   if (mediaRecorderRef.current) {
     mediaRecorderRef.current.stop();
     setRecording(false);
+    // Release the media stream
+    const stream = mediaRecorderRef.current.stream;
+    const tracks = stream.getTracks();
+    tracks.forEach((track) => track.stop());
   }
 };
