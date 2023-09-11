@@ -15,23 +15,12 @@ export default function Home() {
   const [result, setResult] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [recording, setRecording] = useState<boolean>(false);
-  const [micState, setMicState] = useState<any>("inactive");
+  // const [micState, setMicState] = useState<any>("inactive");
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   null;
-
-  useEffect(() => {
-    setUpMediaRecorder({
-      mediaRecorderRef,
-      setLoading,
-      setResult,
-    });
-  }, []);
   return (
     <main className="w-screen h-screen bg-[#FAF9F6]">
       <Navbar />
-      {/* <div> */}
-      {/*   <p>Mic State: {micState}</p> */}
-      {/* </div> */}
       <div className="m-8">
         <Summary result={result} />
 
@@ -40,8 +29,20 @@ export default function Home() {
             <Button
               onClick={
                 recording
-                  ? () => stopRecording({ setRecording, mediaRecorderRef })
-                  : () => startRecording({ setRecording, mediaRecorderRef })
+                  ? () =>
+                      stopRecording({
+                        setRecording,
+                        mediaRecorderRef,
+                        setResult,
+                        setLoading,
+                      })
+                  : () =>
+                      startRecording({
+                        setRecording,
+                        mediaRecorderRef,
+                        setResult,
+                        setLoading,
+                      })
               }
             >
               {recording ? "Stop Recording" : "Start Recording"}

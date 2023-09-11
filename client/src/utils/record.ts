@@ -7,6 +7,8 @@ interface MediaRecorderProps {
 }
 
 interface RecordProps {
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>;
+  setResult: React.Dispatch<React.SetStateAction<string>>;
   setRecording: React.Dispatch<React.SetStateAction<boolean>>;
   mediaRecorderRef: MutableRefObject<MediaRecorder | null>;
 }
@@ -110,12 +112,17 @@ export const setUpMediaRecorder = async ({
   }
 };
 
-export const startRecording = ({
+export const startRecording = async ({
   setRecording,
+  setLoading,
+  setResult,
   mediaRecorderRef,
 }: RecordProps) => {
+  if (!mediaRecorderRef.current) {
+    await setUpMediaRecorder({ setLoading, setResult, mediaRecorderRef });
+  }
   if (mediaRecorderRef.current) {
-    mediaRecorderRef.current.start(500);
+    mediaRecorderRef.current.start();
     setRecording(true);
   }
 };
