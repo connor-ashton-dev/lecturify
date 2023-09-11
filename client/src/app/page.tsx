@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import {
@@ -15,8 +15,13 @@ export default function Home() {
   const [result, setResult] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [recording, setRecording] = useState<boolean>(false);
+  const [micState, setMicState] = useState<any>("inactive");
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  null;
+
   useEffect(() => {
     setUpMediaRecorder({
+      mediaRecorderRef,
       setLoading,
       setResult,
     });
@@ -24,6 +29,9 @@ export default function Home() {
   return (
     <main className="w-screen h-screen bg-[#FAF9F6]">
       <Navbar />
+      <div>
+        <p>Mic State: {micState}</p>
+      </div>
       <div className="m-8">
         <Summary result={result} />
 
@@ -32,8 +40,8 @@ export default function Home() {
             <Button
               onClick={
                 recording
-                  ? () => stopRecording({ setRecording })
-                  : () => startRecording({ setRecording })
+                  ? () => stopRecording({ setRecording, mediaRecorderRef })
+                  : () => startRecording({ setRecording, mediaRecorderRef })
               }
             >
               {recording ? "Stop Recording" : "Start Recording"}
