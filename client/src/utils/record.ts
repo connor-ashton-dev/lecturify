@@ -115,7 +115,7 @@ export const startRecording = ({
   mediaRecorderRef,
 }: RecordProps) => {
   if (mediaRecorderRef.current) {
-    mediaRecorderRef.current.start();
+    mediaRecorderRef.current.start(500);
     setRecording(true);
   }
 };
