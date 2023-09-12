@@ -11,12 +11,15 @@ interface RecordProps {
   setResult: React.Dispatch<React.SetStateAction<string>>;
   setRecording: React.Dispatch<React.SetStateAction<boolean>>;
   mediaRecorderRef: MutableRefObject<MediaRecorder | null>;
+  seconds: number;
 }
 
 const PROD_URL = "https://lecturify-production.up.railway.app";
 const DEV_URL = "http://localhost:1337";
 const prod = process.env.NODE_ENV === "production";
 const apiUrl = prod ? PROD_URL : DEV_URL;
+
+let duration = 0;
 
 export const setUpMediaRecorder = async ({
   setLoading,
@@ -46,9 +49,7 @@ export const setUpMediaRecorder = async ({
           const audioBlob = new Blob(chunks, {
             type: "audio/wav; codecs=opus",
           });
-          console.log("Audio Blob", audioBlob);
           const audioUrl = URL.createObjectURL(audioBlob);
-          console.log("Audio URL", audioUrl);
           const audio = new Audio(audioUrl);
 
           audio.onerror = function (err) {
@@ -70,7 +71,8 @@ export const setUpMediaRecorder = async ({
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ audio: base64Audio }),
+
+              body: JSON.stringify({ audio: base64Audio, seconds: duration }),
             });
             if (response.status !== 200) {
               throw new Error(`Request failed with status ${response.status}`);
@@ -118,7 +120,11 @@ export const startRecording = async ({
   mediaRecorderRef,
 }: RecordProps) => {
   setRecording(true);
-  await setUpMediaRecorder({ setLoading, setResult, mediaRecorderRef });
+  await setUpMediaRecorder({
+    setLoading,
+    setResult,
+    mediaRecorderRef,
+  });
   if (mediaRecorderRef.current) {
     mediaRecorderRef.current.start(500);
   }
@@ -127,11 +133,13 @@ export const startRecording = async ({
 export const stopRecording = ({
   setRecording,
   mediaRecorderRef,
+  seconds,
 }: RecordProps) => {
   if (mediaRecorderRef.current) {
     mediaRecorderRef.current.stop();
     setRecording(false);
     // Release the media stream
+    duration = seconds;
     const stream = mediaRecorderRef.current.stream;
     const tracks = stream.getTracks();
     tracks.forEach((track) => track.stop());

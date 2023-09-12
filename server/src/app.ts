@@ -23,7 +23,8 @@ app.get("/", (req, res) => {
 
 app.post("/transcribe", async (req, res) => {
   const audio = req.body.audio;
-  const transcription = await openAITranscribe(audio);
+  const seconds = req.body.seconds;
+  const transcription = await openAITranscribe(audio, seconds);
   res.send(JSON.stringify({ result: transcription }));
 });
 

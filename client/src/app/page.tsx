@@ -14,6 +14,7 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
   const [recording, setRecording] = useState<boolean>(false);
   const [micState, setMicState] = useState<boolean>(false);
+  const [seconds, setSeconds] = useState<number>(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const checkMic = async () => {
@@ -37,7 +38,12 @@ export default function Home() {
       <Navbar />
 
       <div className="mx-8 mt-8">
-        <Summary result={result} recording={recording} />
+        <Summary
+          result={result}
+          recording={recording}
+          seconds={seconds}
+          setSeconds={setSeconds}
+        />
         <div className="mt-10">
           {!loading && (
             <Button
@@ -53,6 +59,7 @@ export default function Home() {
                         mediaRecorderRef,
                         setResult,
                         setLoading,
+                        seconds,
                       })
                   : () =>
                       micState

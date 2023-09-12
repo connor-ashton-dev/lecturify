@@ -1,69 +1,72 @@
 import OpenAI from "openai";
-import FormData from "form-data";
-import axios from "axios";
 import dotenv from "dotenv";
+import fs from "fs";
+import path from "path";
+import { v4 as uuidv4 } from "uuid";
+import ffmpeg from "fluent-ffmpeg";
 
 dotenv.config();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-const MAX_SIZE = 25 * 1024 * 1024; // 25 megabytes
-export const openAITranscribe = async (base64Audio: string) => {
+
+export const openAITranscribe = async (
+  base64Audio: string,
+  seconds: number
+) => {
   const audioBuffer = Buffer.from(base64Audio, "base64");
-  const numParts = Math.ceil(audioBuffer.length / MAX_SIZE);
-  const transcripts = [];
-  for (let i = 0; i < numParts; i++) {
-    // Calculate start and end indices for slicing
-    const start = i * MAX_SIZE;
-    const end = Math.min((i + 1) * MAX_SIZE, audioBuffer.length);
 
-    // Slice the buffer
-    const slicedBuffer = audioBuffer.subarray(start, end);
+  // Generate a unique filename
+  const filename = uuidv4() + ".wav";
+  const filepath = path.join("/tmp", filename);
 
-    // Get the transcript for this part
-    const transcript = await getTranscript(slicedBuffer);
-
-    // Store the transcript
-    transcripts.push(transcript);
-    console.log(transcripts);
-  }
-
-  // Do something with the transcripts (e.g., concatenate, analyze, etc.)
-  const text = transcripts.join(" ");
-  return text;
-};
-
-const getTranscript = async (audioBuffer: Buffer) => {
-  // Create a FormData object and append the buffer
-  const form = new FormData();
-  form.append("file", audioBuffer, {
-    filename: "audio.wav",
-    contentType: "audio/wav",
-  });
-  form.append("model", "whisper-1");
-
-  // Get headers from the form-data object
-  const formHeaders = form.getHeaders();
+  // Write the buffer to a file
+  fs.writeFileSync(filepath, audioBuffer);
 
   try {
-    // Make the API call
-    const response = await axios.post(
-      "https://api.openai.com/v1/audio/transcriptions",
-      form,
-      {
-        headers: {
-          ...formHeaders,
-          Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-        },
+    // Calculate the number of chunks needed (assuming each chunk is 10 seconds long)
+    const chunkDuration = 20 * 60; // in seconds
+    const numChunks = Math.ceil(seconds / chunkDuration);
+
+    const transcriptions = [];
+
+    if (seconds >= chunkDuration) {
+      for (let i = 0; i < numChunks; i++) {
+        const start = i * chunkDuration;
+        const outputFilename = uuidv4() + "_chunk.wav";
+        const outputPath = path.join("/tmp", outputFilename);
+
+        await new Promise((resolve, reject) => {
+          ffmpeg(filepath)
+            .setStartTime(start)
+            .setDuration(seconds)
+            .output(outputPath)
+            .on("end", resolve)
+            .on("error", reject)
+            .run();
+        });
+        const transcription = await openai.audio.transcriptions.create({
+          file: fs.createReadStream(outputPath),
+          model: "whisper-1",
+        });
+
+        transcriptions.push(transcription.text);
       }
-    );
-    const transcription = response.data;
-    const text = transcription.text;
-    return text;
+    } else {
+      const transcription = await openai.audio.transcriptions.create({
+        file: fs.createReadStream(filepath),
+        model: "whisper-1",
+      });
+
+      transcriptions.push(transcription.text);
+    }
+
+    fs.unlinkSync(filepath);
+    return transcriptions.join(" ");
   } catch (error) {
     console.log(error);
-    return "error";
+    return "Something went wrong with your transcription. We're working on it!";
   }
 };
 
