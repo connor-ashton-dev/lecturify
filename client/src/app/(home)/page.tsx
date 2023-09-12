@@ -19,8 +19,9 @@ export default function Home() {
   const checkMic = async () => {
     let myBool = false;
     try {
-      await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       myBool = true;
+      stream.getTracks().forEach((track) => track.stop());
     } catch (error) {
       myBool = false;
     }
