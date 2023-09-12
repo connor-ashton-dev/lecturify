@@ -65,6 +65,7 @@ export default function Home() {
                       micState
                         ? startRecording({
                             setRecording,
+                            seconds,
                             mediaRecorderRef,
                             setResult,
                             setLoading,
