@@ -33,7 +33,7 @@ export default function Home() {
   return (
     <main className="w-screen h-screen bg-[#FAF9F6]">
       <Navbar />
-      <div className="m-8">
+      <div className="mx-8 mt-8">
         <Summary result={result} />
 
         <div className="mt-10">
