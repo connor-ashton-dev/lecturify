@@ -70,7 +70,7 @@ export default function Home() {
             </Button>
           )}
           {loading && (
-            <Button disabled>
+            <Button disabled size="lg" className="text-lg">
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Please Wait ...
             </Button>
