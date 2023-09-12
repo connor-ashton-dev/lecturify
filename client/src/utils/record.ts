@@ -40,7 +40,6 @@ export const setUpMediaRecorder = async ({
       };
       newMediaRecorder.ondataavailable = (e) => {
         chunks.push(e.data);
-        console.log("Data available:", e.data.size);
       };
       newMediaRecorder.onstop = async () => {
         try {
@@ -121,7 +120,7 @@ export const startRecording = async ({
   setRecording(true);
   await setUpMediaRecorder({ setLoading, setResult, mediaRecorderRef });
   if (mediaRecorderRef.current) {
-    mediaRecorderRef.current.start();
+    mediaRecorderRef.current.start(500);
   }
 };
 
