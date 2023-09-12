@@ -8,9 +8,33 @@ dotenv.config();
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-
+const MAX_SIZE = 25 * 1024 * 1024; // 25 megabytes
 export const openAITranscribe = async (base64Audio: string) => {
   const audioBuffer = Buffer.from(base64Audio, "base64");
+  const numParts = Math.ceil(audioBuffer.length / MAX_SIZE);
+  const transcripts = [];
+  for (let i = 0; i < numParts; i++) {
+    // Calculate start and end indices for slicing
+    const start = i * MAX_SIZE;
+    const end = Math.min((i + 1) * MAX_SIZE, audioBuffer.length);
+
+    // Slice the buffer
+    const slicedBuffer = audioBuffer.subarray(start, end);
+
+    // Get the transcript for this part
+    const transcript = await getTranscript(slicedBuffer);
+
+    // Store the transcript
+    transcripts.push(transcript);
+    console.log(transcripts);
+  }
+
+  // Do something with the transcripts (e.g., concatenate, analyze, etc.)
+  const text = transcripts.join(" ");
+  return text;
+};
+
+const getTranscript = async (audioBuffer: Buffer) => {
   // Create a FormData object and append the buffer
   const form = new FormData();
   form.append("file", audioBuffer, {
@@ -48,51 +72,17 @@ export const openAISummarize = async (text: string) => {
     messages: [
       {
         role: "system",
-        content: `You are an advanced AI proficient in language comprehension and summarization.
-                  Your sole role is to assist students by summarizing various topics. 
-                  Do not answer questions or provide any information that is not part summarizing lectures.
-                  Each summary should consist of four main sections formatted in html. 
-                  Do not include any other text except the html and all text should be in html:
-
-                  (Brief Summary: Provide a concise overview of the topic in paragraph form.)
-                  <div>
-                    <h1>Brief Summary</h1>
-                    <p>This is a summary</p>
-                  </div>
-
-                  (Notes: Turn transcript into bullet points. Do not include any text that is not in the transcript.)
-                  <div>
-                    <h1>Notes</h1>
-                    <p>- This is a bullet point</p>
-                    <p>- This is another bullet point</p>
-                    <p>- This is also another bullet point</p>
-                  </div>
-
-                  (Practice Questions: Generate a practice quiz with several questions and answers. There will be a question, 4 answer choices, and 1 right answer 
-                  <div>
-                    <h1>Practice Questions</h1>
-                    <p><strong>Question 1:</strong> What is the answer to this question?</p>
-                    <p>A) Answer choice A </p>
-                    <p>B) Answer choice B</p>
-                    <p>C) Answer choice C</p>
-                    <p>D) Answer choice D</p>
-                    <p>Answer: D</p>
-
-                    <p><strong>Question 2:</strong> What is the answer to this question?</p>
-                    <p>A) Answer choice A </p>
-                    <p>B) Answer choice B</p>
-                    <p>C) Answer choice C</p>
-                    <p>D) Answer choice D</p>
-                    <p>Answer: C</p>
-                  </div>
-
-                  (Helpful Definitions: Include definitions of key terms that are relevant to the topic.)
-                  <div>
-                    <h1>Helpful Definitions</h1>
-                    <p><strong>Word:</strong> This is a definition</p>
-                    <p><strong>Another word:</strong> This is another definition</p>
-                  </div>
-                  `,
+        content: `
+        You're an AI designed to help students digest college lectures. Using only the provided transcript, create HTML summaries in these four HTML sections: 
+        Brief Summary: A concise overview.
+        <div><h1>Brief Summary</h1><p>Summary</p></div>
+        Notes: Bullet-pointed transcript.
+        <div><h1>Notes</h1><p>- Bullet</p></div>
+        Practice Questions: Quiz with several questions and answers.
+        <div><h1>Practice Questions</h1><p><strong>Q1:</strong> Question?</p><p>A) A</p><p>B) B</p><p>C) C</p><p>D) D</p><p>Answer: D</p></div>
+        Helpful Definitions: Definitions of key terms.
+        <div><h1>Helpful Definitions</h1><p><strong>Word:</strong> Definition</p></div>
+        `,
       },
       {
         role: "user",
