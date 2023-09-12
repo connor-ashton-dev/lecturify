@@ -73,12 +73,7 @@ export default function Home() {
           )}
         </div>
       </div>
-
-      {micState ? (
-        <p className="absolute bottom-0 right-0 m-4 font-bold bg-white shadow-lg p-4 rounded-lg">
-          ✅ Mic is on
-        </p>
-      ) : (
+      {!micState && (
         <p className="absolute bottom-0 right-0 m-4 font-bold bg-white shadow-lg p-4 rounded-lg">
           ⚠️ Mic is off
         </p>
