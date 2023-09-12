@@ -10,6 +10,7 @@ import {
 
 interface SummaryProps {
   result: string;
+  recording: boolean;
 }
 
 const fakeResult = `
@@ -53,33 +54,29 @@ const fakeResult = `
 
 `;
 
-const Summary = ({ result }: SummaryProps) => {
+const Summary = ({ result, recording }: SummaryProps) => {
   return (
     <div>
-      {result ? (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-2xl text-indigo-500 font-bold">
-              Note Title
-            </CardTitle>
-            <CardDescription>Class Name</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div
-              className={styles.summaryDiv}
-              dangerouslySetInnerHTML={{ __html: result }}
-            />
-          </CardContent>
-        </Card>
-      ) : (
-        <div>
-          <div>Press record to start recording...</div>
-          <div>
-            <span className="text-rose-500">Important! </span>
-            Currently a 25 min limit on lecture length (in progress 🤙)
-          </div>
-        </div>
-      )}
+      <Card className="relative">
+        {recording && (
+          <>
+            <div className="absolute animate-ping right-0 top-0 m-6 w-4 h-4 bg-red-500 rounded-full" />
+            <div className="absolute right-0 top-0 m-6 w-4 h-4 bg-red-500 rounded-full" />
+          </>
+        )}
+        <CardHeader>
+          <CardTitle className="text-2xl text-indigo-500 font-bold">
+            Note Title
+          </CardTitle>
+          <CardDescription>Class Name</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div
+            className={styles.summaryDiv}
+            dangerouslySetInnerHTML={{ __html: result }}
+          />
+        </CardContent>
+      </Card>
     </div>
   );
 };
