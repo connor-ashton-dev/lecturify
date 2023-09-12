@@ -40,7 +40,7 @@ export const openAITranscribe = async (
         await new Promise((resolve, reject) => {
           ffmpeg(filepath)
             .setStartTime(start)
-            .setDuration(seconds)
+            .setDuration(chunkDuration)
             .output(outputPath)
             .on("end", resolve)
             .on("error", reject)
@@ -49,10 +49,12 @@ export const openAITranscribe = async (
         const transcription = await openai.audio.transcriptions.create({
           file: fs.createReadStream(outputPath),
           model: "whisper-1",
+          prompt: "Here is the previous audio" + transcriptions.join(" "),
         });
 
         transcriptions.push(transcription.text);
       }
+      console.log(transcriptions);
     } else {
       const transcription = await openai.audio.transcriptions.create({
         file: fs.createReadStream(filepath),
