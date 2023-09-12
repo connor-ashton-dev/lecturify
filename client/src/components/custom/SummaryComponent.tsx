@@ -4,7 +4,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -71,12 +70,15 @@ const Summary = ({ result }: SummaryProps) => {
               dangerouslySetInnerHTML={{ __html: result }}
             />
           </CardContent>
-          {/* <CardFooter> */}
-          {/*   <p>Card Footer</p> */}
-          {/* </CardFooter> */}
         </Card>
       ) : (
-        <div>Press record to start recording...</div>
+        <div>
+          <div>Press record to start recording...</div>
+          <div>
+            <span className="text-rose-500">Important! </span>
+            Currently a 25 min limit on lecture length (in progress 🤙)
+          </div>
+        </div>
       )}
     </div>
   );

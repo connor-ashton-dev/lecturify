@@ -4,10 +4,17 @@ import { UserButton } from "@clerk/nextjs";
 
 const Navbar = () => {
   return (
-    <nav className="w-full p-6 flex justify-between bg-white shadow-md">
+    <nav className="w-full p-6 flex justify-between items-center bg-white shadow-md">
       <h1>Lecturify</h1>
       <div>
-        <UserButton afterSignOutUrl="/" />
+        <UserButton
+          afterSignOutUrl="/"
+          appearance={{
+            elements: {
+              avatarBox: "h-[48px] w-[48px]",
+            },
+          }}
+        />
       </div>
     </nav>
   );

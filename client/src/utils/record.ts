@@ -118,10 +118,10 @@ export const startRecording = async ({
   setResult,
   mediaRecorderRef,
 }: RecordProps) => {
+  setRecording(true);
   await setUpMediaRecorder({ setLoading, setResult, mediaRecorderRef });
   if (mediaRecorderRef.current) {
     mediaRecorderRef.current.start();
-    setRecording(true);
   }
 };
 
