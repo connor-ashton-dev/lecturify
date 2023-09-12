@@ -9,20 +9,21 @@ import Navbar from "@/components/custom/navbar";
 
 export default function Home() {
   const [result, setResult] = useState<string>(
-    "No data yet! Press record to start transcribing🔥"
+    "No data yet! Press record to start transcribing 🔥"
   );
   const [loading, setLoading] = useState<boolean>(false);
   const [recording, setRecording] = useState<boolean>(false);
-  //TODO: Make mic state
   const [micState, setMicState] = useState<boolean>(false);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
 
   const checkMic = async () => {
     let myBool = false;
-    await navigator.mediaDevices
-      .getUserMedia({ audio: true })
-      .then(() => (myBool = true))
-      .catch(() => (myBool = false));
+    try {
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+      myBool = true;
+    } catch (error) {
+      myBool = false;
+    }
     setMicState(myBool);
   };
   // see if system mic is on
@@ -39,6 +40,9 @@ export default function Home() {
         <div className="mt-10">
           {!loading && (
             <Button
+              size="lg"
+              className="text-lg"
+              variant="default"
               onClick={
                 // FIX: This is soooo ugly idk man
                 recording

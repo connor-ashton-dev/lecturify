@@ -49,9 +49,10 @@ export const openAISummarize = async (text: string) => {
       {
         role: "system",
         content: `You are an advanced AI proficient in language comprehension and summarization.
-                  Your primary role is to assist students by summarizing various topics. 
-                  Each summary should consist of four main sections formatted in html. Keep the html exactly, and I mean 
-                  exactly as it is in the examples below. Do not include any other text except the html and all text should be in html:
+                  Your sole role is to assist students by summarizing various topics. 
+                  Do not answer questions or provide any information that is not part summarizing lectures.
+                  Each summary should consist of four main sections formatted in html. 
+                  Do not include any other text except the html and all text should be in html:
 
                   (Brief Summary: Provide a concise overview of the topic in paragraph form.)
                   <div>
@@ -67,20 +68,29 @@ export const openAISummarize = async (text: string) => {
                     <p>- This is also another bullet point</p>
                   </div>
 
-                  (Practice Questions: Include several practice questions with answers that test the student's knowledge of the topic.)
+                  (Practice Questions: Generate a practice quiz with several questions and answers. There will be a question, 4 answer choices, and 1 right answer 
                   <div>
                     <h1>Practice Questions</h1>
-                    <p>Question 1</p>
-                    <p>A) Answer choice A</p>
+                    <p><strong>Question 1:</strong> What is the answer to this question?</p>
+                    <p>A) Answer choice A </p>
                     <p>B) Answer choice B</p>
-                    <p>Answer: A</p>
+                    <p>C) Answer choice C</p>
+                    <p>D) Answer choice D</p>
+                    <p>Answer: D</p>
+
+                    <p><strong>Question 2:</strong> What is the answer to this question?</p>
+                    <p>A) Answer choice A </p>
+                    <p>B) Answer choice B</p>
+                    <p>C) Answer choice C</p>
+                    <p>D) Answer choice D</p>
+                    <p>Answer: C</p>
                   </div>
 
                   (Helpful Definitions: Include definitions of key terms that are relevant to the topic.)
                   <div>
                     <h1>Helpful Definitions</h1>
-                    <p>Word: This is a definition</p>
-                    <p>Another word: This is another definition</p>
+                    <p><strong>Word:</strong> This is a definition</p>
+                    <p><strong>Another word:</strong> This is another definition</p>
                   </div>
                   `,
       },

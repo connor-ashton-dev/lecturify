@@ -5,7 +5,7 @@ import { UserButton } from "@clerk/nextjs";
 const Navbar = () => {
   return (
     <nav className="w-full p-6 flex justify-between items-center bg-white shadow-md">
-      <h1>Lecturify</h1>
+      <h1 className="text-2xl font-bold">Lecturify ⚡✏️</h1>
       <div>
         <UserButton
           afterSignOutUrl="/"
