@@ -1,39 +1,53 @@
-import express from "express";
-import dotenv from "dotenv";
-import bodyParser from "body-parser";
-import cors from "cors";
+import Fastify from "fastify";
+import cors from "@fastify/cors";
 import { openAISummarize, openAITranscribe } from "./utils";
-dotenv.config();
-const app = express();
 
-//TODO: AUTH AND CORS
-app.use(
-  cors({
-    origin: "*",
-    methods: ["GET", "POST"],
-  })
-);
-
-app.use(bodyParser.json({ limit: "50mb" }));
-const port = process.env.PORT || 1337;
-
-app.get("/", (req, res) => {
-  res.send("Hello World!");
+const fastify = Fastify({
+  logger: true,
 });
 
-app.post("/transcribe", async (req, res) => {
+fastify.register(cors, {
+  origin: (origin, cb) => {
+    if (!origin) {
+      //  Request from localhost will pass
+      cb(new Error("Not allowed"), false);
+      return;
+    }
+    const hostname = new URL(origin).hostname;
+    if (hostname === "localhost" || hostname === "lecturify.vercel.app") {
+      //  Request from localhost will pass
+      cb(null, true);
+      return;
+    }
+    // Generate an error on other origins, disabling access
+    cb(new Error("Not allowed"), false);
+    return;
+  },
+
+  methods: ["GET", "POST"],
+});
+//
+const PORT = process.env.PORT || 1337;
+
+fastify.post("/transcribe", async (req, res) => {
   const audio = req.body.audio;
   const seconds = req.body.seconds;
   const transcription = await openAITranscribe(audio, seconds);
   res.send(JSON.stringify({ result: transcription }));
 });
 
-app.post("/summarize", async (req, res) => {
+fastify.post("/summarize", async (req, res) => {
   const text = req.body.text;
   const summary = await openAISummarize(text);
   res.send(JSON.stringify({ result: summary }));
 });
 
-app.listen(port, () => {
-  return console.log(`Running on port:${port}`);
-});
+const start = async () => {
+  try {
+    await fastify.listen({ port: Number(PORT) });
+  } catch (err) {
+    fastify.log.error(err);
+    process.exit(1);
+  }
+};
+start();
