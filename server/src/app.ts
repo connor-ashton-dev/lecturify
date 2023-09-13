@@ -18,7 +18,7 @@ const fastify = Fastify({
 
 fastify.register(cors, {
   //FIXME: This is a security risk
-  origin: true,
+  origin: "*",
 
   methods: ["GET", "POST"],
 });
