@@ -17,22 +17,8 @@ const fastify = Fastify({
 });
 
 fastify.register(cors, {
-  origin: (origin, cb) => {
-    if (!origin) {
-      //  Request from localhost will pass
-      cb(new Error("Not allowed"), false);
-      return;
-    }
-    const hostname = new URL(origin).hostname;
-    if (hostname === "localhost" || hostname === "lecturify.vercel.app") {
-      //  Request from localhost will pass
-      cb(null, true);
-      return;
-    }
-    // Generate an error on other origins, disabling access
-    cb(new Error("Not allowed"), false);
-    return;
-  },
+  //FIXME: This is a security risk
+  origin: true,
 
   methods: ["GET", "POST"],
 });
