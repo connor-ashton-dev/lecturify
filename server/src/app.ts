@@ -24,10 +24,7 @@ fastify.register(cors, {
       return;
     }
     const hostname = new URL(origin).hostname;
-    if (
-      hostname === "localhost" ||
-      hostname === "https://lecturify.vercel.app"
-    ) {
+    if (hostname === "localhost" || hostname === "lecturify.vercel.app") {
       //  Request from localhost will pass
       cb(null, true);
       return;
@@ -63,7 +60,7 @@ fastify.post(
 
 const start = async () => {
   try {
-    await fastify.listen({ port: Number(PORT) });
+    await fastify.listen({ port: Number(PORT), host: "0.0.0.0" });
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
