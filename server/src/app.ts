@@ -36,7 +36,7 @@ fastify.register(cors, {
 
   methods: ["GET", "POST"],
 });
-//
+
 const PORT = process.env.PORT || 1337;
 
 fastify.post(
