@@ -1,6 +1,16 @@
 import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { openAISummarize, openAITranscribe } from "./utils";
+import type { FastifyRequest } from "fastify";
+
+interface TranscribeTypes {
+  audio: string;
+  seconds: number;
+}
+
+interface SummarizeTypes {
+  text: string;
+}
 
 const fastify = Fastify({
   logger: true,
@@ -14,7 +24,10 @@ fastify.register(cors, {
       return;
     }
     const hostname = new URL(origin).hostname;
-    if (hostname === "localhost" || hostname === "lecturify.vercel.app") {
+    if (
+      hostname === "localhost" ||
+      hostname === "https://lecturify.vercel.app"
+    ) {
       //  Request from localhost will pass
       cb(null, true);
       return;
@@ -29,18 +42,24 @@ fastify.register(cors, {
 //
 const PORT = process.env.PORT || 1337;
 
-fastify.post("/transcribe", async (req, res) => {
-  const audio = req.body.audio;
-  const seconds = req.body.seconds;
-  const transcription = await openAITranscribe(audio, seconds);
-  res.send(JSON.stringify({ result: transcription }));
-});
+fastify.post(
+  "/transcribe",
+  async (req: FastifyRequest<{ Body: TranscribeTypes }>, res) => {
+    const audio = req.body.audio;
+    const seconds = req.body.seconds;
+    const transcription = await openAITranscribe(audio, seconds);
+    res.send(JSON.stringify({ result: transcription }));
+  }
+);
 
-fastify.post("/summarize", async (req, res) => {
-  const text = req.body.text;
-  const summary = await openAISummarize(text);
-  res.send(JSON.stringify({ result: summary }));
-});
+fastify.post(
+  "/summarize",
+  async (req: FastifyRequest<{ Body: SummarizeTypes }>, res) => {
+    const text = req.body.text;
+    const summary = await openAISummarize(text);
+    res.send(JSON.stringify({ result: summary }));
+  }
+);
 
 const start = async () => {
   try {
