@@ -44,10 +44,11 @@ const HomeUI = () => {
             <Card className="w-80 md:w-96 flex flex-col items-center justify-center text-center ">
               <CardHeader>
                 <CardTitle className="text-2xl text-indigo-500">
-                  Transcribe a lecture
+                  Transcribe a lecture ✍️
                 </CardTitle>
                 <CardDescription>
-                  Take your hands off the keyboard and pay attention.
+                  Take your hands off the keyboard and let us do the work for
+                  you.
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -95,11 +96,11 @@ const HomeUI = () => {
           <Card className="w-80 md:w-96 flex flex-col items-center justify-center text-center">
             <CardHeader>
               <CardTitle className="text-2xl text-indigo-500">
-                View your lectures
+                View your lectures 👀
               </CardTitle>
               <CardDescription>
-                Use AI to your advantage. Get help and understand what your
-                teachers are telling you.
+                Use AI to your advantage. Get help and understand exactly what
+                your teachers are telling you.
               </CardDescription>
             </CardHeader>
           </Card>
