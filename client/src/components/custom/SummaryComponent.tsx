@@ -29,7 +29,7 @@ const Summary = ({ result, recording, seconds, setSeconds }: SummaryProps) => {
   }
 
   return (
-    <div>
+    <div className="mt-8">
       <Card className="relative">
         {recording && <Timer seconds={seconds} setSeconds={setSeconds} />}
         <CardHeader>

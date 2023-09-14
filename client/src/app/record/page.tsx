@@ -38,7 +38,7 @@ const RecordPage = () => {
   }, []);
 
   return (
-    <div className="mx-8 mt-8">
+    <div className="mx-8">
       <Summary
         result={result}
         recording={recording}
