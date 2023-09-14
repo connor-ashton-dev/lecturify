@@ -49,7 +49,6 @@ export const openAITranscribe = async (
         const transcription = await openai.audio.transcriptions.create({
           file: fs.createReadStream(outputPath),
           model: "whisper-1",
-          prompt: "Here is the previous audio" + transcriptions.join(" "),
         });
 
         transcriptions.push(transcription.text);

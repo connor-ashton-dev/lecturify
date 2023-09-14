@@ -14,13 +14,14 @@ interface SummarizeTypes {
 
 const fastify = Fastify({
   logger: true,
+  bodyLimit: 100 * 1024 * 1024, // Default Limit set to 30MB
 });
 
 fastify.register(cors, {
   //FIXME: This is a security risk
   origin: "*",
 
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 });
 
 const PORT = process.env.PORT || 1337;
