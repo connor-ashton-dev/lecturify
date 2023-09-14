@@ -1,95 +1,110 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
-import Summary from "./SummaryComponent";
+import Link from "next/link";
+import React from "react";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Button } from "../ui/button";
-import { stopRecording, startRecording } from "@/utils/record";
-import { Loader2 } from "lucide-react";
+import { useLectureStore } from "@/utils/store";
+import { useRouter } from "next/navigation";
 
 const HomeUI = () => {
-  const [result, setResult] = useState<string>(
-    "No data yet! Press record to start transcribing 🔥"
-  );
-  const [loading, setLoading] = useState<boolean>(false);
-  const [recording, setRecording] = useState<boolean>(false);
-  const [micState, setMicState] = useState<boolean>(false);
-  const [seconds, setSeconds] = useState<number>(0);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const [className, setClassName] = React.useState<string>("");
+  const [noteTitle, setNoteTitle] = React.useState<string>("");
+  const { changeClass, changeTitle } = useLectureStore((state) => state);
+  const router = useRouter();
 
-  const checkMic = async () => {
-    let myBool = false;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      myBool = true;
-      stream.getTracks().forEach((track) => track.stop());
-    } catch (error) {
-      myBool = false;
-    }
-    setMicState(myBool);
+  const handleCreateLecture = async () => {
+    changeClass(className);
+    changeTitle(noteTitle);
+    router.push("/record");
   };
 
-  useEffect(() => {
-    const setStuffUp = async () => {
-      await checkMic();
-    };
-
-    setStuffUp();
-  }, []);
   return (
-    <div>
-      <div className="mx-8 mt-8">
-        <Summary
-          result={result}
-          recording={recording}
-          seconds={seconds}
-          setSeconds={setSeconds}
-        />
-        <div className="mt-10">
-          {!loading && (
-            <Button
-              size="lg"
-              className="text-lg"
-              variant="default"
-              onClick={
-                // FIX: This is soooo ugly idk man
-                recording
-                  ? () =>
-                      stopRecording({
-                        setRecording,
-                        mediaRecorderRef,
-                        setResult,
-                        setLoading,
-                        seconds,
-                      })
-                  : () =>
-                      micState
-                        ? startRecording({
-                            setRecording,
-                            seconds,
-                            mediaRecorderRef,
-                            setResult,
-                            setLoading,
-                          })
-                        : alert(
-                            "Please enable your microphone to use this app."
-                          )
-              }
-            >
-              {recording ? "Stop Recording" : "Start Recording"}
-            </Button>
-          )}
-          {loading && (
-            <Button disabled size="lg" className="text-lg">
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Please Wait ...
-            </Button>
-          )}
-        </div>
+    <div className="flex flex-col items-center mx-8 mt-8 ">
+      {/* LINKS */}
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* TRANSCRIBE */}
+        <Dialog>
+          <DialogTrigger>
+            <Card className="w-80 md:w-96 flex flex-col items-center justify-center text-center ">
+              <CardHeader>
+                <CardTitle className="text-2xl text-indigo-500">
+                  Transcribe a lecture
+                </CardTitle>
+                <CardDescription>
+                  Take your hands off the keyboard and pay attention.
+                </CardDescription>
+              </CardHeader>
+            </Card>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Create a lecture</DialogTitle>
+              <DialogDescription>
+                Fill in some info about your lecture
+              </DialogDescription>
+            </DialogHeader>
+            {/* TODO: Make this a dropdown */}
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="email">Class Name</Label>
+              <Input
+                type="text"
+                placeholder="Name here..."
+                onChange={(e) => setClassName(e.target.value)}
+              />
+            </div>
+            <div className="grid w-full max-w-sm items-center gap-1.5">
+              <Label htmlFor="email">Note Title</Label>
+              <Input
+                type="text"
+                placeholder="Title here..."
+                onChange={(e) => setNoteTitle(e.target.value)}
+              />
+            </div>
+            <DialogFooter>
+              <div className="w-full flex justify-start">
+                <Button
+                  variant="primary"
+                  type="submit"
+                  onClick={handleCreateLecture}
+                >
+                  Create
+                </Button>
+              </div>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* VIEW */}
+        <Link href={"/record"}>
+          <Card className="w-80 md:w-96 flex flex-col items-center justify-center text-center">
+            <CardHeader>
+              <CardTitle className="text-2xl text-indigo-500">
+                View your lectures
+              </CardTitle>
+              <CardDescription>
+                Use AI to your advantage. Get help and understand what your
+                teachers are telling you.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        </Link>
       </div>
-      {!micState && (
-        <p className="absolute bottom-0 right-0 m-4 font-bold bg-white shadow-lg p-4 rounded-lg">
-          ⚠️ Mic is off
-        </p>
-      )}
     </div>
   );
 };

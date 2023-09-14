@@ -2,14 +2,16 @@ import React from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UserButton } from "@clerk/nextjs";
 import { initialProfile } from "@/utils/users";
+import Link from "next/link";
 
 const Navbar = async () => {
-  console.log("im here");
+  //TODO: Something here
   const user = await initialProfile();
-  console.log("USER", user);
   return (
-    <nav className="w-full p-6 flex justify-between items-center bg-white shadow-md">
-      <h1 className="text-2xl font-bold">Lecturify ⚡✏️</h1>
+    <nav className="w-full p-6 flex justify-between items-center bg-white shadow-md z-10">
+      <Link href="/">
+        <h1 className="text-2xl font-bold">Lecturify ⚡✏️</h1>
+      </Link>
       <div>
         <UserButton
           afterSignOutUrl="/"

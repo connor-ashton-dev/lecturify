@@ -127,6 +127,7 @@ export const startRecording = async ({
     mediaRecorderRef,
   });
   if (mediaRecorderRef.current) {
+    setResult("Recording your lecture. Press stop when you're done!");
     mediaRecorderRef.current.start(500);
   }
 };
@@ -135,10 +136,12 @@ export const stopRecording = ({
   setRecording,
   mediaRecorderRef,
   seconds,
+  setResult,
 }: RecordProps) => {
   if (mediaRecorderRef.current) {
     mediaRecorderRef.current.stop();
     setRecording(false);
+    setResult("Starting transcription. Hang tight!");
     // Release the media stream
     duration = seconds;
     const stream = mediaRecorderRef.current.stream;
