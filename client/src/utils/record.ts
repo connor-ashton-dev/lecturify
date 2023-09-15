@@ -99,7 +99,6 @@ export const setUpMediaRecorder = async ({
             const summaryRes = await summary.json();
             const text: string = summaryRes.result;
             setResult(text);
-            // formatResult({ text, setResult });
 
             setLoading(false);
           };
