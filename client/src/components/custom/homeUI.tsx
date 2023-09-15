@@ -35,13 +35,13 @@ const HomeUI = () => {
   };
 
   return (
-    <div className="flex flex-col items-center mx-8 mt-8 ">
+    <div className="flex flex-col items-center justify-center mx-8 ">
       {/* LINKS */}
-      <div className="flex flex-col md:flex-row gap-8">
+      <div className="flex flex-col md:flex-row gap-8 mt-36">
         {/* TRANSCRIBE */}
         <Dialog>
           <DialogTrigger>
-            <Card className="w-80 md:w-96 flex flex-col items-center justify-center text-center ">
+            <Card className="w-80 md:w-96 md:h-80 flex flex-col items-center justify-center text-center md:rounded-2xl">
               <CardHeader>
                 <CardTitle className="text-2xl text-indigo-500">
                   Transcribe a lecture ✍️
@@ -93,7 +93,7 @@ const HomeUI = () => {
 
         {/* VIEW */}
         <Link href={"/record"}>
-          <Card className="w-80 md:w-96 flex flex-col items-center justify-center text-center">
+          <Card className="w-80 md:w-96 md:h-80 flex flex-col items-center justify-center text-center md:rounded-2xl">
             <CardHeader>
               <CardTitle className="text-2xl text-indigo-500">
                 View your lectures 👀

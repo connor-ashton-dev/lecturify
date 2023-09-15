@@ -10,7 +10,7 @@ const Navbar = async () => {
   return (
     <nav className="w-full p-6 flex justify-between items-center bg-white shadow-md z-10">
       <Link href="/">
-        <h1 className="text-2xl font-bold">Lecturify ⚡✏️</h1>
+        <h1 className="text-2xl tracking-wide font-bold">Lecturify ⚡✏️</h1>
       </Link>
       <div>
         <UserButton
