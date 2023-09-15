@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <body className="w-screen h-screen bg-[#FAF9F6]">
+        <body className="w-screen h-screen bg-[#F8F9F9]">
           {/* <body className="w-screen h-screen bg-gray-700"> */}
           {/* <body className="w-screen h-screen bg-gradient-to-b from-violet-400 via-indigo-500 to-blue-600"> */}
           <Navbar />
