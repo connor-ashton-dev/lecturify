@@ -2,6 +2,7 @@ import Fastify from "fastify";
 import cors from "@fastify/cors";
 import { openAISummarize, openAITranscribe } from "./utils";
 import type { FastifyRequest } from "fastify";
+import { db } from "./db";
 
 interface TranscribeTypes {
   audio: string;
@@ -10,6 +11,8 @@ interface TranscribeTypes {
 
 interface SummarizeTypes {
   text: string;
+  title: string;
+  classId: string;
 }
 
 const fastify = Fastify({
@@ -40,10 +43,54 @@ fastify.post(
   "/summarize",
   async (req: FastifyRequest<{ Body: SummarizeTypes }>, res) => {
     const text = req.body.text;
+    const title = req.body.title;
+    const classId = req.body.classId;
     const summary = await openAISummarize(text);
+    if (summary) {
+      const upload = await uploadWithoutClient(summary, title, classId);
+      if (!upload) {
+        res.send(JSON.stringify({ result: "Error uploading lecture" }));
+      }
+    }
     res.send(JSON.stringify({ result: summary }));
   }
 );
+
+const uploadWithoutClient = async (
+  transcript: string,
+  title: string,
+  classId: string
+) => {
+  // lecture to users class
+  const lecture = await db.lecture.create({
+    data: {
+      title: title,
+      content: transcript,
+      updatedAt: new Date(),
+      createdAt: new Date(),
+    },
+  });
+
+  if (lecture) {
+    const myClass = await db.class.update({
+      where: {
+        id: classId,
+      },
+      data: {
+        lectures: {
+          connect: {
+            id: lecture.id,
+          },
+        },
+      },
+    });
+
+    if (!myClass) {
+      return false;
+    }
+    return true;
+  }
+};
 
 const start = async () => {
   try {

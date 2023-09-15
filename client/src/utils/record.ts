@@ -100,7 +100,11 @@ export const setUpMediaRecorder = async ({
               headers: {
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify({ text: data.result }),
+              body: JSON.stringify({
+                text: data.result,
+                title: classTitle,
+                classId: classId,
+              }),
             });
 
             if (summary.status !== 200) {
