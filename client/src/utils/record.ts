@@ -115,13 +115,14 @@ export const setUpMediaRecorder = async ({
             const text: string = summaryRes.result;
             setResult(text);
 
+            //INFO: this adds on the frontent
             // update db
-            const update = await axios.post("/api/lectures/add", {
-              classId,
-              userId: user?.id,
-              transcript: text,
-              title: classTitle,
-            });
+            // const update = await axios.post("/api/lectures/add", {
+            //   classId,
+            //   userId: user?.id,
+            //   transcript: text,
+            //   title: classTitle,
+            // });
 
             setLoading(false);
           };
