@@ -4,7 +4,7 @@ import Summary from "@/components/custom/SummaryComponent";
 import { Button } from "@/components/ui/button";
 import { stopRecording, startRecording } from "@/utils/record";
 import { Loader2 } from "lucide-react";
-import { useLectureStore } from "@/utils/store";
+import { useLectureStore, userStore } from "@/utils/store";
 
 const RecordPage = () => {
   const [result, setResult] = useState<string>(
@@ -16,6 +16,15 @@ const RecordPage = () => {
   const [micState, setMicState] = useState<boolean>(false);
   const [seconds, setSeconds] = useState<number>(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const { user } = userStore((state) => {
+    return {
+      user: state.user,
+    };
+  });
+
+  const { classTitle, classId } = useLectureStore((state) => {
+    return { classTitle: state.title, classId: state.classId };
+  });
 
   const checkMic = async () => {
     let myBool = false;
@@ -61,6 +70,9 @@ const RecordPage = () => {
                       setResult,
                       setLoading,
                       seconds,
+                      user,
+                      classId,
+                      classTitle,
                     })
                 : () =>
                     micState
@@ -70,6 +82,9 @@ const RecordPage = () => {
                           mediaRecorderRef,
                           setResult,
                           setLoading,
+                          user,
+                          classId,
+                          classTitle,
                         })
                       : alert("Please enable your microphone to use this app.")
             }

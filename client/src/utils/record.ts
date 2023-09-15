@@ -1,9 +1,14 @@
+import { User } from "@prisma/client";
+import axios from "axios";
 import { MutableRefObject } from "react";
 
 interface MediaRecorderProps {
   setLoading: React.Dispatch<React.SetStateAction<boolean>>;
   setResult: React.Dispatch<React.SetStateAction<string>>;
   mediaRecorderRef: MutableRefObject<MediaRecorder | null>;
+  user: User;
+  classId: string;
+  classTitle: string;
 }
 
 interface RecordProps {
@@ -12,6 +17,9 @@ interface RecordProps {
   setRecording: React.Dispatch<React.SetStateAction<boolean>>;
   mediaRecorderRef: MutableRefObject<MediaRecorder | null>;
   seconds: number;
+  user: User | null;
+  classId: string;
+  classTitle: string;
 }
 
 const PROD_URL = "https://lecturify-production.up.railway.app";
@@ -25,6 +33,9 @@ let duration = 0;
 export const setUpMediaRecorder = async ({
   setLoading,
   setResult,
+  user,
+  classId,
+  classTitle,
   mediaRecorderRef,
 }: MediaRecorderProps) => {
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -100,6 +111,14 @@ export const setUpMediaRecorder = async ({
             const text: string = summaryRes.result;
             setResult(text);
 
+            // update db
+            const update = await axios.post("/api/lectures/add", {
+              classId,
+              userId: user?.id,
+              transcript: text,
+              title: classTitle,
+            });
+
             setLoading(false);
           };
         } catch (error: any) {
@@ -117,13 +136,22 @@ export const startRecording = async ({
   setRecording,
   setLoading,
   setResult,
+  user,
+  classId,
+  classTitle,
   mediaRecorderRef,
 }: RecordProps) => {
   setRecording(true);
+  if (!user) {
+    return;
+  }
   await setUpMediaRecorder({
     setLoading,
     setResult,
     mediaRecorderRef,
+    user,
+    classId,
+    classTitle,
   });
   if (mediaRecorderRef.current) {
     setResult("Recording your lecture. Press stop when you're done!");
@@ -131,7 +159,7 @@ export const startRecording = async ({
   }
 };
 
-export const stopRecording = ({
+export const stopRecording = async ({
   setRecording,
   mediaRecorderRef,
   seconds,

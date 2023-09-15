@@ -14,8 +14,8 @@ model Class {
   createdAt DateTime  @default(now())
   updatedAt DateTime
   userId    String?
-  User      User?     @relation(fields: [userId], references: [id])
-  Lecture   Lecture[]
+  User      User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lectures  Lecture[]
 }
 
 model Lecture {
@@ -25,14 +25,14 @@ model Lecture {
   createdAt DateTime @default(now())
   updatedAt DateTime
   classId   String?
-  Class     Class?   @relation(fields: [classId], references: [id])
+  Class     Class?   @relation(fields: [classId], references: [id], onDelete: Cascade)
 }
 
 model User {
-  id        String   @id @default(uuid())
+  id        String   @id @unique @default(uuid())
   email     String   @unique
   name      String?
   updatedAt DateTime
   createdAt DateTime @default(now())
-  Class     Class[]
+  classes   Class[]
 }

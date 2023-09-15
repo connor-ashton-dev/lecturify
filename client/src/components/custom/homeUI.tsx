@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Card,
   CardDescription,
@@ -19,18 +19,33 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "../ui/button";
-import { useLectureStore } from "@/utils/store";
+import { useLectureStore, userStore } from "@/utils/store";
 import { useRouter } from "next/navigation";
+import { ComboBox } from "./comboBox";
+import { User } from "@prisma/client";
 
-const HomeUI = () => {
-  const [className, setClassName] = React.useState<string>("");
+interface HomeUIProps {
+  user: User | null;
+}
+
+const HomeUI = ({ user }: HomeUIProps) => {
   const [noteTitle, setNoteTitle] = React.useState<string>("");
   const { changeClass, changeTitle } = useLectureStore((state) => state);
   const router = useRouter();
+  const { setUser } = userStore((state) => {
+    return {
+      setUser: state.setUser,
+    };
+  });
+
+  useEffect(() => {
+    if (user) {
+      setUser(user);
+    }
+  }, [setUser, user]);
 
   const handleCreateLecture = async () => {
     changeTitle(noteTitle);
-    changeClass(className);
     router.push(`/record`);
   };
 
@@ -62,12 +77,8 @@ const HomeUI = () => {
             </DialogHeader>
             {/* TODO: Make this a dropdown */}
             <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label htmlFor="email">Class Name</Label>
-              <Input
-                type="text"
-                placeholder="Name here..."
-                onChange={(e) => setClassName(e.target.value)}
-              />
+              <Label>Class</Label>
+              <ComboBox />
             </div>
             <div className="grid w-full max-w-sm items-center gap-1.5">
               <Label htmlFor="email">Note Title</Label>
