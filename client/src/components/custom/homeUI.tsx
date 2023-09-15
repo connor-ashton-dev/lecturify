@@ -29,9 +29,9 @@ const HomeUI = () => {
   const router = useRouter();
 
   const handleCreateLecture = async () => {
-    changeClass(className);
     changeTitle(noteTitle);
-    router.push("/record");
+    changeClass(className);
+    router.push(`/record`);
   };
 
   return (

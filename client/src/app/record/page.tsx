@@ -85,9 +85,13 @@ const RecordPage = () => {
         )}
       </div>
       {!micState && (
-        <p className="absolute bottom-0 right-0 m-4 font-bold bg-white shadow-lg p-4 rounded-lg">
-          ⚠️ Mic is off
-        </p>
+        <button
+          className="absolute bottom-0 right-0 m-4 font-bold bg-white shadow-lg p-4 rounded-lg"
+          onClick={checkMic}
+        >
+          <span className="text-yellow-500">⚠️</span> Mic is off. Click to
+          enable.
+        </button>
       )}
     </div>
   );
