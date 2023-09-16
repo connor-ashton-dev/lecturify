@@ -88,6 +88,9 @@ export function ComboBox() {
           id: res.data.result.id,
         };
         setFilteredOptions((prevOptions) => [...prevOptions, newOption]);
+        setClassChosen(newOption.label);
+        setClass(newOption.label);
+        setClassId(newOption.id);
       }
     } else {
       console.error("a mysterious error occured in the addClass function");

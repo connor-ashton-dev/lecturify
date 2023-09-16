@@ -75,9 +75,8 @@ const HomeUI = ({ user }: HomeUIProps) => {
                 Fill in some info about your lecture
               </DialogDescription>
             </DialogHeader>
-            {/* TODO: Make this a dropdown */}
             <div className="grid w-full max-w-sm items-center gap-1.5">
-              <Label>Class</Label>
+              <Label>Class (click to select)</Label>
               <ComboBox />
             </div>
             <div className="grid w-full max-w-sm items-center gap-1.5">
