@@ -103,7 +103,7 @@ const HomeUI = ({ user }: HomeUIProps) => {
         </Dialog>
 
         {/* VIEW */}
-        <Link href={"/record"}>
+        <Link href={"/view"}>
           <Card className="w-80 md:w-96 md:h-80 flex flex-col items-center justify-center text-center md:rounded-2xl">
             <CardHeader>
               <CardTitle className="text-2xl text-indigo-500">

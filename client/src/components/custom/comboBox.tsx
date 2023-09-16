@@ -96,10 +96,8 @@ export function ComboBox() {
   };
 
   const getClasses = async (user: User) => {
-    const res = await axios.get("/api/classes/get", {
-      params: {
-        userId: user.id,
-      },
+    const res = await axios.post("/api/classes/getClasses", {
+      userId: user.id,
     });
     if (res.status === 200) {
       const classes = res.data.result.classes;
