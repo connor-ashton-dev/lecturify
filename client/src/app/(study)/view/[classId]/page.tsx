@@ -40,26 +40,36 @@ const ClassPage = ({ params }: { params: { classId: string } }) => {
 
     getCurrentClass();
   }, [params.classId]);
+
+  const formatDate = (date: Date) => {
+    const d = new Date(date);
+    return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
+  };
+
   return (
     <div className="flex flex-col items-center">
-      {data ? (
+      {loading && <p className="text-center">Loading...</p>}
+      {!loading && data && data.lectures.length > 0 && (
         <div className="flex flex-col items-center">
           <h1 className="text-2xl font-bold py-4">{data.title}:</h1>
-          <div className="flex flex-row gap-4">
+          <div className="grid grid-cols-2 gap-4">
             {data?.lectures.map((l) => (
               <Link href={`/view/lecture/${l.id}`} key={l.id}>
                 <Card className="w-40 md:w-52 md:h-40 flex flex-col items-center justify-center text-center md:rounded-2xl">
                   <CardHeader>
-                    <CardTitle>{l.title}</CardTitle>
+                    <CardTitle className="text-xl">{l.title}</CardTitle>
+                    <CardDescription>{formatDate(l.createdAt)}</CardDescription>
                   </CardHeader>
                 </Card>
               </Link>
             ))}
           </div>
         </div>
-      ) : (
-        <p>Loading ...</p>
       )}
+      {!data ||
+        (data.lectures.length == 0 && !loading && (
+          <p className="text-center">No lectures found for this class</p>
+        ))}
     </div>
   );
 };

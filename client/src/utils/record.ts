@@ -78,44 +78,51 @@ export const setUpMediaRecorder = async ({
             }
             const base64Audio = result.split(",")[1];
             //Transcribe
+            setResult(
+              `Transcribing and summarizing your lecture. The lecture will be available in your dashboard so feel free to close this tab if you need to.`
+            );
             const response = await fetch(`${apiUrl}/transcribe`, {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
               },
 
-              body: JSON.stringify({ audio: base64Audio, seconds: duration }),
+              body: JSON.stringify({
+                audio: base64Audio,
+                seconds: duration,
+                title: classTitle,
+                classId: classId,
+              }),
             });
             if (response.status !== 200) {
               throw new Error(`Request failed with status ${response.status}`);
             }
 
             const data = await response.json();
-            console.log(data.result);
-            setResult("Transcribed your lecture! Now summarizing it...");
+            setResult(data.result);
 
-            //Summarize
-            const summary = await fetch(`${apiUrl}/summarize`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                text: data.result,
-                title: classTitle,
-                classId: classId,
-              }),
-            });
+            // //Summarize
+            // const summary = await fetch(`${apiUrl}/summarize`, {
+            //   method: "POST",
+            //   headers: {
+            //     "Content-Type": "application/json",
+            //   },
+            //   body: JSON.stringify({
+            //     text: data.result,
+            //     title: classTitle,
+            //     classId: classId,
+            //   }),
+            // });
 
-            if (summary.status !== 200) {
-              throw new Error(`Request failed with status ${summary.status}`);
-            }
+            // if (summary.status !== 200) {
+            //   throw new Error(`Request failed with status ${summary.status}`);
+            // }
+            //
+            // const summaryRes = await summary.json();
+            // const text: string = summaryRes.result;
+            // setResult(text);
 
-            const summaryRes = await summary.json();
-            const text: string = summaryRes.result;
-            setResult(text);
-
-            //INFO: this adds on the frontent
+            //INFO: this adds on the frontend
             // update db
             // const update = await axios.post("/api/lectures/add", {
             //   classId,

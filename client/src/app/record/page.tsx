@@ -42,7 +42,6 @@ const RecordPage = () => {
     const setStuffUp = async () => {
       await checkMic();
     };
-
     setStuffUp();
   }, []);
 

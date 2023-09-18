@@ -56,21 +56,30 @@ const ViewClasses = () => {
   return (
     <div className="flex flex-col items-center">
       <h1 className="text-2xl font-bold py-4">My Classes:</h1>
-      {loading && <p className="text-center">Loading...</p>}
-      <div className="grid grid-cols-2 gap-4">
-        {classes.map((c) => (
-          <Link href={`/view/${c.id}`} key={c.id}>
-            <Card className="w-40 md:w-52 md:h-40 flex flex-col items-center justify-center text-center md:rounded-2xl">
-              <CardHeader>
-                <CardTitle>{c.title}</CardTitle>
-                <CardDescription>
-                  {c.lectures.length} lecture(s)
-                </CardDescription>
-              </CardHeader>
-            </Card>
-          </Link>
-        ))}
-      </div>
+      {loading ? (
+        <p className="text-center">Loading...</p>
+      ) : (
+        <>
+          {classes.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4">
+              {classes.map((c) => (
+                <Link href={`/view/${c.id}`} key={c.id}>
+                  <Card className="w-40 md:w-52 md:h-40 flex flex-col items-center justify-center text-center md:rounded-2xl">
+                    <CardHeader>
+                      <CardTitle>{c.title}</CardTitle>
+                      <CardDescription>
+                        {c.lectures.length} lecture(s)
+                      </CardDescription>
+                    </CardHeader>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center">No classes yet</p>
+          )}
+        </>
+      )}
     </div>
   );
 };

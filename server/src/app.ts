@@ -7,13 +7,16 @@ import { db } from "./db";
 interface TranscribeTypes {
   audio: string;
   seconds: number;
-}
-
-interface SummarizeTypes {
-  text: string;
+  transcript: string;
   title: string;
   classId: string;
 }
+
+// interface SummarizeTypes {
+//   text: string;
+//   title: string;
+//   classId: string;
+// }
 
 const urls = [
   "https://www.lecturify.vercel.app/*",
@@ -25,7 +28,7 @@ const urls = [
 ];
 
 const fastify = Fastify({
-  logger: true,
+  // logger: true,
   bodyLimit: 100 * 1024 * 1024, // Default Limit set to 30MB
 });
 
@@ -42,27 +45,45 @@ fastify.post(
   async (req: FastifyRequest<{ Body: TranscribeTypes }>, res) => {
     const audio = req.body.audio;
     const seconds = req.body.seconds;
-    const transcription = await openAITranscribe(audio, seconds);
-    res.send(JSON.stringify({ result: transcription }));
-  }
-);
-
-fastify.post(
-  "/summarize",
-  async (req: FastifyRequest<{ Body: SummarizeTypes }>, res) => {
-    const text = req.body.text;
     const title = req.body.title;
     const classId = req.body.classId;
-    const summary = await openAISummarize(text);
-    if (summary) {
-      const upload = await uploadWithoutClient(summary, title, classId);
-      if (!upload) {
-        res.send(JSON.stringify({ result: "Error uploading lecture" }));
-      }
-    }
+    const transcription = await openAITranscribe(audio, seconds);
+    const summary = await summarizeEverything(transcription, title, classId);
     res.send(JSON.stringify({ result: summary }));
   }
 );
+
+const summarizeEverything = async (
+  text: string,
+  title: string,
+  classId: string
+) => {
+  const summary = await openAISummarize(text);
+  if (summary) {
+    const upload = await uploadWithoutClient(summary, title, classId);
+    if (!upload) {
+      return "error uploading lecture";
+    }
+  }
+  return summary;
+};
+
+// fastify.post(
+//   "/summarize",
+//   async (req: FastifyRequest<{ Body: SummarizeTypes }>, res) => {
+//     const text = req.body.text;
+//     const title = req.body.title;
+//     const classId = req.body.classId;
+//     const summary = await openAISummarize(text);
+//     if (summary) {
+//       const upload = await uploadWithoutClient(summary, title, classId);
+//       if (!upload) {
+//         res.send(JSON.stringify({ result: "Error uploading lecture" }));
+//       }
+//     }
+//     res.send(JSON.stringify({ result: summary }));
+//   }
+// );
 
 const uploadWithoutClient = async (
   transcript: string,
@@ -103,6 +124,7 @@ const uploadWithoutClient = async (
 const start = async () => {
   try {
     await fastify.listen({ port: Number(PORT), host: "0.0.0.0" });
+    console.log(`Server listening on port ${PORT}`);
   } catch (err) {
     fastify.log.error(err);
     process.exit(1);
