@@ -15,14 +15,22 @@ interface SummarizeTypes {
   classId: string;
 }
 
+const urls = [
+  "https://www.lecturify.vercel.app/*",
+  "https://www.lecturify.vercel.app",
+  "https://lecturify.vercel.app/*",
+  "https://lecturify.vercel.app",
+  "http://localhost:3000",
+  "http://localhost:3000/*",
+];
+
 const fastify = Fastify({
   logger: true,
   bodyLimit: 100 * 1024 * 1024, // Default Limit set to 30MB
 });
 
 fastify.register(cors, {
-  //FIXME: This is a security risk
-  origin: "*",
+  origin: urls,
 
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 });
