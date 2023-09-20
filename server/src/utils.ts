@@ -3,7 +3,9 @@ import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
+import { path as ffmpegPath } from "@ffmpeg-installer/ffmpeg";
 import ffmpeg from "fluent-ffmpeg";
+ffmpeg.setFfmpegPath(ffmpegPath);
 
 dotenv.config();
 
