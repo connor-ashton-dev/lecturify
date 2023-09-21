@@ -27,8 +27,7 @@ export const openAITranscribe = async (
   fs.writeFileSync(filepath, audioBuffer);
 
   try {
-    // Calculate the number of chunks needed (assuming each chunk is 10 seconds long)
-    const chunkDuration = 20 * 60; // in seconds
+    const chunkDuration = 10 * 60; // in seconds
     const numChunks = Math.ceil(seconds / chunkDuration);
 
     const transcriptions = [];
