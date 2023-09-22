@@ -30,8 +30,8 @@ const RecordPage = () => {
   useEffect(() => {
     const mySpeechRecognition = new SpeechRecognition();
     mySpeechRecognition.continuous = true;
-    mySpeechRecognition.interimResults = true;
-    mySpeechRecognition.lang = "en-US";
+    mySpeechRecognition.interimResults = false;
+    mySpeechRecognition.lang = navigator.language || "en-US";
     mySpeechRecognition.maxAlternatives = 1;
 
     setRecognition(mySpeechRecognition);
@@ -47,8 +47,13 @@ const RecordPage = () => {
     };
 
     mySpeechRecognition.onerror = (event) => {
+      console.log("Chrome", navigator.userAgent.indexOf("Chrome") != -1);
+      console.log("Lang attribute is: ", mySpeechRecognition.lang);
       console.log("Speech recognition error:", event);
-      setResult("Error occurred in recording. Please try again!");
+      setResult(
+        "Error occurred in recording. Please try again! Make sure you are using Chrome as well."
+      );
+      setRecording(false);
     };
 
     mySpeechRecognition.onend = () => {
