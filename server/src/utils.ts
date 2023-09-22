@@ -17,54 +17,58 @@ export const openAITranscribe = async (
   base64Audio: string,
   seconds: number
 ) => {
-  const audioBuffer = Buffer.from(base64Audio, "base64");
-
-  // Generate a unique filename
-  const filename = uuidv4() + ".wav";
-  const filepath = path.join("/tmp", filename);
-
-  // Write the buffer to a file
-  fs.writeFileSync(filepath, audioBuffer);
+  // const audioBuffer = Buffer.from(base64Audio, "base64");
+  //
+  // // Generate a unique filename
+  // const filename = uuidv4() + ".wav";
+  // const filepath = path.join("/tmp", filename);
+  const filepath = path.join(__dirname, "testLecture.mp3");
+  seconds = 4642;
+  //
+  // // Write the buffer to a file
+  // fs.writeFileSync(filepath, audioBuffer);
 
   try {
-    const chunkDuration = 10 * 60; // in seconds
+    const chunkDuration = 2 * 60; // in seconds
     const numChunks = Math.ceil(seconds / chunkDuration);
+    console.log("numChunks", numChunks);
 
     const transcriptions = [];
 
-    if (seconds >= chunkDuration) {
-      for (let i = 0; i < numChunks; i++) {
-        const start = i * chunkDuration;
-        const outputFilename = uuidv4() + "_chunk.wav";
-        const outputPath = path.join("/tmp", outputFilename);
+    // if (seconds >= chunkDuration) {
+    for (let i = 0; i < numChunks; i++) {
+      console.log("chunk", i);
+      const start = i * chunkDuration;
+      const outputFilename = uuidv4() + "_chunk.wav";
+      const outputPath = path.join("/tmp", outputFilename);
 
-        await new Promise((resolve, reject) => {
-          ffmpeg(filepath)
-            .setStartTime(start)
-            .setDuration(chunkDuration)
-            .output(outputPath)
-            .on("end", resolve)
-            .on("error", reject)
-            .run();
-        });
-        const transcription = await openai.audio.transcriptions.create({
-          file: fs.createReadStream(outputPath),
-          model: "whisper-1",
-        });
-
-        transcriptions.push(transcription.text);
-      }
-      console.log(transcriptions);
-    } else {
+      await new Promise((resolve, reject) => {
+        ffmpeg(filepath)
+          .setStartTime(start)
+          .setDuration(chunkDuration)
+          .output(outputPath)
+          .on("end", resolve)
+          .on("error", reject)
+          .run();
+      });
       const transcription = await openai.audio.transcriptions.create({
-        file: fs.createReadStream(filepath),
+        file: fs.createReadStream(outputPath),
         model: "whisper-1",
       });
 
       transcriptions.push(transcription.text);
     }
+    console.log(transcriptions);
+    // } else {
+    //   const transcription = await openai.audio.transcriptions.create({
+    //     file: fs.createReadStream(filepath),
+    //     model: "whisper-1",
+    //   });
+    //
+    // transcriptions.push(transcription.text);
+    // }
 
-    fs.unlinkSync(filepath);
+    // fs.unlinkSync(filepath);
     return transcriptions.join(" ");
   } catch (error) {
     console.log(error);

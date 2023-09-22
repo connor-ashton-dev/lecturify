@@ -2,49 +2,80 @@
 import React, { useState, useRef, useEffect } from "react";
 import Summary from "@/components/custom/SummaryComponent";
 import { Button } from "@/components/ui/button";
-import { stopRecording, startRecording } from "@/utils/record";
-import { Loader2 } from "lucide-react";
-import { useLectureStore, userStore } from "@/utils/store";
+import { useLectureStore } from "@/utils/store";
+
+import { apiUrl } from "@/utils/api";
+import axios from "axios";
 
 const RecordPage = () => {
   const [result, setResult] = useState<string>(
     "No data yet! Press record to start transcribing 🔥"
   );
 
+  const SpeechRecognition =
+    window.SpeechRecognition || window.webkitSpeechRecognition;
+
   const [loading, setLoading] = useState<boolean>(false);
   const [recording, setRecording] = useState<boolean>(false);
-  const [micState, setMicState] = useState<boolean>(false);
   const [seconds, setSeconds] = useState<number>(0);
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const { user } = userStore((state) => {
-    return {
-      user: state.user,
-    };
-  });
+  const [recognition, setRecognition] = useState<SpeechRecognition | null>(
+    null
+  );
+  const transcriptRef = useRef<string>("");
 
   const { classTitle, classId } = useLectureStore((state) => {
     return { classTitle: state.title, classId: state.classId };
   });
 
-  const checkMic = async () => {
-    let myBool = false;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      myBool = true;
-      stream.getTracks().forEach((track) => track.stop());
-    } catch (error) {
-      myBool = false;
-    }
-    setMicState(myBool);
-  };
-
   useEffect(() => {
-    const setStuffUp = async () => {
-      await checkMic();
-    };
-    setStuffUp();
-  }, []);
+    const mySpeechRecognition = new SpeechRecognition();
+    mySpeechRecognition.continuous = true;
+    mySpeechRecognition.interimResults = true;
+    mySpeechRecognition.lang = "en-US";
+    mySpeechRecognition.maxAlternatives = 1;
 
+    setRecognition(mySpeechRecognition);
+
+    mySpeechRecognition.onresult = (event) => {
+      const myResult = event.results[0][0].transcript;
+      transcriptRef.current = myResult;
+    };
+
+    mySpeechRecognition.onstart = () => {
+      console.log("Speech recognition started");
+      setResult("Recording your lecture. Press stop when you're done!");
+    };
+
+    mySpeechRecognition.onerror = (event) => {
+      console.log("Speech recognition error:", event);
+      setResult("Error occurred in recording. Please try again!");
+    };
+
+    mySpeechRecognition.onend = () => {
+      console.log("Speech recognition ended");
+    };
+  }, [SpeechRecognition]);
+
+  const transcribe = async () => {
+    if (!recording) {
+      setRecording(true);
+      recognition?.start();
+    } else {
+      setRecording(false);
+      recognition?.stop();
+      setResult("Transcribing your lecture. Please wait...");
+      console.log("Transcript:", transcriptRef.current);
+
+      const response = await axios.post(`${apiUrl}/transcribe`, {
+        transcript: transcriptRef.current,
+        title: classTitle,
+        classId,
+      });
+
+      const data = await response.data;
+      setResult(data.result);
+    }
+  };
   return (
     <div className="mx-8">
       <Summary
@@ -59,54 +90,12 @@ const RecordPage = () => {
             size="lg"
             className="text-lg"
             variant="default"
-            onClick={
-              // FIX: This is soooo ugly idk man
-              recording
-                ? () =>
-                    stopRecording({
-                      setRecording,
-                      mediaRecorderRef,
-                      setResult,
-                      setLoading,
-                      seconds,
-                      user,
-                      classId,
-                      classTitle,
-                    })
-                : () =>
-                    micState
-                      ? startRecording({
-                          setRecording,
-                          seconds,
-                          mediaRecorderRef,
-                          setResult,
-                          setLoading,
-                          user,
-                          classId,
-                          classTitle,
-                        })
-                      : alert("Please enable your microphone to use this app.")
-            }
+            onClick={transcribe}
           >
             {recording ? "Stop Recording" : "Start Recording"}
           </Button>
         )}
-        {loading && (
-          <Button disabled size="lg" className="text-lg">
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-            Please Wait ...
-          </Button>
-        )}
       </div>
-      {!micState && (
-        <button
-          className="absolute bottom-0 right-0 m-4 font-bold bg-white shadow-lg p-4 rounded-lg"
-          onClick={checkMic}
-        >
-          <span className="text-yellow-500">⚠️</span> Mic is off. Click to
-          enable.
-        </button>
-      )}
     </div>
   );
 };
