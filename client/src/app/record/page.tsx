@@ -47,8 +47,6 @@ const RecordPage = () => {
     };
 
     mySpeechRecognition.onerror = (event) => {
-      console.log("Chrome", navigator.userAgent.indexOf("Chrome") != -1);
-      console.log("Lang attribute is: ", mySpeechRecognition.lang);
       console.log("Speech recognition error:", event);
       setResult(
         "Error occurred in recording. Please try again! Make sure you are using Chrome as well."
@@ -70,13 +68,11 @@ const RecordPage = () => {
       recognition?.stop();
       setResult("Transcribing your lecture. Please wait...");
       console.log("Transcript:", transcriptRef.current);
-
       const response = await axios.post(`${apiUrl}/transcribe`, {
         transcript: transcriptRef.current,
         title: classTitle,
         classId,
       });
-
       const data = await response.data;
       setResult(data.result);
     }
