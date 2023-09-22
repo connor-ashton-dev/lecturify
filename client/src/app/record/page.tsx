@@ -62,6 +62,7 @@ const RecordPage = () => {
   const transcribe = async () => {
     if (!recording) {
       setRecording(true);
+      transcriptRef.current = "";
       recognition?.start();
     } else {
       setRecording(false);
